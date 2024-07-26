@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "lib": [
+      "ESNext"
+    ],
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "experimentalDecorators": true,
+    // "": true,
+    "removeComments": true,
+    "sourceMap": true,
+    "target": "ES2020",
+    "outDir": "dist",
+    "rootDir": ".",
+    "strict": true,
+  },
+  "include": [
+    "src/**/**.ts",
+    "tests/**/**.ts",
+  ],
+  "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]
+
+}
