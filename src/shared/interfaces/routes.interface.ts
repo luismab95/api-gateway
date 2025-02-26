@@ -1,7 +1,10 @@
 export interface RoutesInterface {
   route: string;
   target: string;
-  middlewares: string[];
-  origins: string[];
-  whiteListPermission: string[];
+  middlewares: MiddlewareInterface[];
+}
+
+interface MiddlewareInterface {
+  name: string;
+  props: any;
 }

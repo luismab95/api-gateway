@@ -3,7 +3,8 @@ dotenv.config();
 
 export const config = {
   server: {
-    port: process.env.PORT,
+    hostname: process.env.HOST || "0.0.0.0",
+    port: Number(process.env.PORT) || 9000,
     rateLimit: Number(process.env.RATE_LIMIT),
   },
 };
