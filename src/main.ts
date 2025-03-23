@@ -1,52 +1,54 @@
 import express, { Request, Response } from "express";
+import { createProxyMiddleware } from "http-proxy-middleware";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
-import { createProxyMiddleware } from "http-proxy-middleware";
-import { config } from "./shared/environments/load-env";
-import { ERR_404, OK_200 } from "./shared/constants/messages";
-import { CodeHttpEnum } from "./shared/enum/http-code.enum";
-import { middlewareName as rateLimitAndTimeout } from "./shared/middlewares/rate-limit.middleware";
-import { RoutesInterface } from "./shared/interfaces/routes.interface";
-import { getRoutes } from "./config/routes";
-// import { Database } from "lib-database/src/shared/config/database";
+import colors from "colors";
 
-const ServerDbConnect = async () => {
-  // await Database.connect();
-  startServer();
-};
+import {
+  ERR_502,
+  CodeHttpEnum,
+  config,
+  errorHandler,
+  RoutesInterface,
+  RequestCountRateLimitInterface,
+  routes,
+} from "./shared";
 
 const startServer = async () => {
-  const { port } = config.server;
+  await runServer();
+};
+
+const runServer = () => {
+  const { port, hostname } = config.server;
 
   const app = express();
+  const corsOptions = {
+    origin: "",
+  };
 
-  app.disable("x-powered-by");
-  app.use(cors());
+  app.use(cors(corsOptions));
   app.use(
     helmet({
       crossOriginResourcePolicy: false,
     })
   );
   app.use(morgan("combined"));
+  app.disable("x-powered-by");
 
-  app.get("/ms-gateway", async (_req: Request, res: Response) => {
-    res.json({
-      data: "Bienvenido/a, pero no hay nada que ver aquí!.",
-      message: OK_200,
+  app.get(`/`, (_req: Request, res: Response) => {
+    res.status(200).json({
+      status: true,
+      message: "Bienvenido/a, pero no hay nada que ver aquí!.",
     });
   });
 
-  (global as any).requestCounts = {};
+  global.requestCounts = [];
   setInterval(() => {
-    Object.keys((global as any).requestCounts).forEach((ip) => {
-      (global as any).requestCounts[ip] = 0;
+    global.requestCounts.forEach((item: RequestCountRateLimitInterface) => {
+      item.count = 0;
     });
   }, 60000);
-
-  app.use(rateLimitAndTimeout);
-
-  const routes = await getRoutes();
 
   routes.forEach((item: RoutesInterface) => {
     const proxyOptions = {
@@ -57,44 +59,38 @@ const startServer = async () => {
         [`^${item.route}`]: "",
       },
       on: {
-        error: (err: any, _req: any, res: any, _target: any) => {
+        econnreset: (err: any, _req: Request, res: Response, _target: any) => {
           res.status(CodeHttpEnum.internalServerError).json({
-            message: err.code,
-            statusCode: err.code,
+            status: false,
+            message: ERR_502,
           });
         },
-        econnreset: (err: any, _req: any, res: any, _target: any) => {
+        error: (err: any, _req: Request, res: Response, _target: any) => {
           res.status(CodeHttpEnum.internalServerError).json({
-            message: err.code,
-            statusCode: err.code,
+            status: false,
+            message: ERR_502,
           });
         },
       },
     };
+
     const middlewares = item.middlewares.map((middleware) => {
-      const { middlewareName } = require(`./shared/middlewares/${middleware}`);
-      return middlewareName;
+      const customMiddleware = require(`./middlewares/${middleware.name}`);
+      return customMiddleware.default;
     });
     app.use(item.route, ...middlewares, createProxyMiddleware(proxyOptions));
   });
 
-  app.use((_req: Request, res: Response) => {
-    res.status(CodeHttpEnum.notFound).json({
-      message: ERR_404,
-      statusCode: CodeHttpEnum.notFound,
-    });
-  });
+  app.use(errorHandler);
 
   process.env.TZ = "America/Guayaquil";
-  app.listen(Number(port), () => {
-    console.info(`API-GATEWAY iniciado en el puerto: ${port}`);
+  app.listen(port, hostname, () => {
+    console.info(colors.green.bold(`GATEWAY iniciado en ${hostname}:${port}`));
   });
 };
 
-ServerDbConnect();
+startServer();
 
-// Cerrar la conexión a la base de datos al salir de la aplicación
 process.on("SIGINT", async () => {
-  // await Database.disconnect();
   process.exit(0);
 });
