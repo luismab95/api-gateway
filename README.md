@@ -1,67 +1,70 @@
-# API-GATEWAY
+# API Gateway
 
-This project is a interactive api gateway application built with Node.js, Express, and TypeScript.
+This project is an **interactive API Gateway** built with **Node.js**, **Express**, and **TypeScript**.
 
-## Prerequisites
+## 📦 Prerequisites
 
-- Node.js (>= 22.x)
-- npm (>= 10.x) or yarn (>= 1.x)
+- **Node.js** >= 22.x  
+- **npm** >= 10.x _or_ **Yarn** >= 1.x
 
-## Getting Started
+## 🚀 Getting Started
 
-### Installation
+### 🔧 Installation
 
-1. Clone the repository:
-    ```sh
-    git clone https://github.com/luismab95/api-gateway.git
-    cd your-project
-    ```
+1. **Clone the repository:**
+   ```sh
+   git clone https://github.com/luismab95/api-gateway.git
+   cd api-gateway
+   ```
 
-2. Install dependencies:
-    ```sh
-    npm install
-    # or
-    yarn install
-    ```
+2. **Install dependencies:**
+   ```sh
+   npm install
+   # or
+   yarn install
+   ```
 
-### Running the Application
+### ▶️ Running the Application
 
-To start the development server, run:
+Start the development server:
+
 ```sh
 npm run dev
 # or
 yarn dev
 ```
 
-The server will start on `http://0.0.0.0:9000`.
+The server will be available at: [http://0.0.0.0:9000](http://0.0.0.0:9000)
 
-### Building the Application
+### 🛠️ Building the Application
 
-To build the project, run:
+To compile the TypeScript source code:
+
 ```sh
 npm run build
 # or
 yarn build
 ```
 
-### Running the Test
+The output will be generated in the `dist` directory.
 
-To start the test, run:
+### ✅ Running Tests
+
+Run the test suite:
+
 ```sh
-npm run test
+npm test
 # or
 yarn test
 ```
 
-The compiled JavaScript files will be in the `dist` directory.
+### 📜 Available Scripts
 
-### Scripts
+- `dev` — Run the application in development mode with live reload.
+- `build` — Compile the TypeScript code to JavaScript.
+- `start` — Start the compiled production build.
+- `test` — Run the unit tests.
 
-- `dev`: Run the application in development mode.
-- `build`: Compile TypeScript to JavaScript.
-- `start`: Start the compiled application.
-- `test`: Run unit test.
+## 📄 License
 
-## License
-
-This project is licensed under the MIT License.
+This project is licensed under the **MIT License**.
