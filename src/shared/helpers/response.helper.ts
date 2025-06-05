@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import colors from "colors";
 import { CodeHttpEnum } from "../enum/http-code.enum";
-import { ERR_500 } from "../constants/messages";
+import { ERR_500, logger } from "../";
 
 export class ErrorResponse extends Error {
   statusCode: number;
@@ -19,7 +18,8 @@ export const errorHandler = (
   res: Response,
   _next: NextFunction
 ) => {
-  console.error(colors.red.bold(error.stack));
+  
+  logger.error(error.stack);
 
   const statusCode = error.statusCode || CodeHttpEnum.internalServerError;
   const message = error.message || ERR_500;

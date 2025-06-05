@@ -1,10 +1,19 @@
-export interface RoutesInterface {
+export interface RouteI {
+  protocol: string;
   route: string;
+  port: number;
+  host: string;
   target: string;
-  middlewares: MiddlewareInterface[];
+  middlewares: MiddlewareI[];
 }
 
-interface MiddlewareInterface {
+export interface MiddlewareI {
   name: string;
   props: any;
+}
+
+export interface ProxyI {
+  route: string;
+  middlewares: any[];
+  proxy: any;
 }

@@ -1,6 +1,0 @@
-//todo
-    // add database and replace json
-    // add test unit ?????
-    // logs
-    // read  middlewares
-    // escale estructura
