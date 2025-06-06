@@ -3,5 +3,6 @@
         "src"
     ],
     "ext": "ts",
-    "exec": "concurrently  \"npx tsc --watch \"  \"ts-node src/main.ts \""
+    "exec": "concurrently  \"npx tsc --watch \"  \"ts-node src/server.ts \""
 }
+

@@ -2,11 +2,10 @@ import { Response, Request, NextFunction } from "express";
 import {
   CodeHttpEnum,
   faliedMiddleware,
-  LoggingService,
-  routes,
+  services,
+  logger,
+  ERR_403,
 } from "../shared";
-
-const loggingService = new LoggingService();
 
 export const originMiddleware = async (
   req: Request,
@@ -16,6 +15,9 @@ export const originMiddleware = async (
   try {
     const url = req.baseUrl;
     const requestIp = req.ip;
+
+    const routes = await services();
+
     const findRoute = routes.find(
       (route) =>
         route.target.includes(url) &&
@@ -28,12 +30,7 @@ export const originMiddleware = async (
     )?.props.origins;
 
     if (!findRoute)
-      return next(
-        faliedMiddleware(
-          "Lo sentimos, no tienes permisos para acceder a este recurso. Por favor, ponte en contacto con el administrador del sistema si necesitas ayuda adicional.",
-          CodeHttpEnum.forbidden
-        )
-      );
+      return next(faliedMiddleware(ERR_403, CodeHttpEnum.forbidden));
 
     if (origins && origins.length > 0) {
       const findOrigin = origins.find((origin: string) =>
@@ -41,23 +38,13 @@ export const originMiddleware = async (
       );
 
       if (!findOrigin)
-        return next(
-          faliedMiddleware(
-            "Lo sentimos, no tienes permisos para acceder a este recurso. Por favor, ponte en contacto con el administrador del sistema si necesitas ayuda adicional.",
-            CodeHttpEnum.forbidden
-          )
-        );
+        return next(faliedMiddleware(ERR_403, CodeHttpEnum.forbidden));
     }
 
     next();
   } catch (err) {
-    loggingService.error((err as any).message);
-    return next(
-      faliedMiddleware(
-        "Lo sentimos, no tienes permisos para acceder a este recurso. Por favor, ponte en contacto con el administrador del sistema si necesitas ayuda adicional.",
-        CodeHttpEnum.forbidden
-      )
-    );
+    logger.error((err as any).message);
+    return next(faliedMiddleware(ERR_403, CodeHttpEnum.forbidden));
   }
 };
 

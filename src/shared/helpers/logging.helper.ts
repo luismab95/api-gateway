@@ -1,59 +1,45 @@
-import winston from "winston";
-import DailyRotateFile from "winston-daily-rotate-file";
+import { createLogger, format, transports } from "winston";
+import path from "path";
+import fs from "fs";
 
-export class LoggingService {
-  private logger: winston.Logger;
-  private customLevels = {
-    levels: {
-      error: 0,
-      warning: 1,
-      info: 2,
-      debug: 3,
-    },
-    colors: {
-      error: "red",
-      warning: "yellow",
-      info: "green",
-      debug: "blue",
-    },
-  };
-
-  constructor() {
-    this.logger = winston.createLogger({
-      levels: this.customLevels.levels,
-      format: winston.format.combine(
-        winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss.SSS Z" }),
-        winston.format.printf(({ level, message, timestamp }) => {
-          return `${timestamp} ${level}: ${message}`;
-        })
-      ),
-      transports: [
-        new winston.transports.Console(),
-        new DailyRotateFile({
-          dirname: "logs",
-          filename: "ms-gateway-%DATE%.log",
-          datePattern: "YYYY-MM",
-          zippedArchive: true,
-          maxSize: "20m",
-          maxFiles: "12m",
-        }),
-      ],
-    });
-  }
-
-  error(message: string): void {
-    this.logger.error(message);
-  }
-
-  warning(message: string): void {
-    this.logger.warning(message);
-  }
-
-  info(message: string): void {
-    this.logger.info(message);
-  }
-
-  debug(message: string): void {
-    this.logger.debug(message);
-  }
+const logDir = path.resolve(__dirname, "../../../", "logs");
+if (!fs.existsSync(logDir)) {
+  fs.mkdirSync(logDir);
 }
+
+const logFormat = format.printf(({ timestamp, level, message }) => {
+  return `[${timestamp}] ${level.toUpperCase()}: ${message}`;
+});
+
+// Helper para filtrar por nivel exacto
+const filterOnly = (level: string) =>
+  format((info) => (info.level === level ? info : false))();
+
+const logger = createLogger({
+  level: "debug",
+  format: format.combine(
+    format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+    logFormat
+  ),
+  transports: [
+    new transports.Console(),
+    new transports.File({
+      filename: path.join(logDir, "error.log"),
+      format: filterOnly("error"),
+    }),
+    new transports.File({
+      filename: path.join(logDir, "warn.log"),
+      format: filterOnly("warn"),
+    }),
+    new transports.File({
+      filename: path.join(logDir, "info.log"),
+      format: filterOnly("info"),
+    }),
+    new transports.File({
+      filename: path.join(logDir, "debug.log"),
+      format: filterOnly("debug"),
+    }),
+  ],
+});
+
+export { logger };

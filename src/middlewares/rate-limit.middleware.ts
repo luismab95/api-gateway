@@ -1,17 +1,16 @@
 import { NextFunction, Request, Response } from "express";
 import {
   CodeHttpEnum,
-  config,
+  environment,
   ERR_429,
   ERR_504,
   faliedMiddleware,
-  LoggingService,
-  RequestCountRateLimitInterface,
-  routes,
+  logger,
+  RequestCountRateLimitI,
+  services,
 } from "../shared";
 
-const { rateLimit } = config.server;
-const loggingService = new LoggingService();
+const { RATE_LIMIT } = environment;
 
 export const rateLimitAndTimeoutMiddleware = async (
   req: Request,
@@ -19,6 +18,8 @@ export const rateLimitAndTimeoutMiddleware = async (
   next: NextFunction
 ) => {
   try {
+    const routes = await services();
+
     const findRoute = routes.find(
       (route) =>
         route.target.includes(req.baseUrl) &&
@@ -32,10 +33,9 @@ export const rateLimitAndTimeoutMiddleware = async (
     )?.props.rateLimit;
 
     if (!rateLimitMiddleware || rateLimitMiddleware === 0)
-      rateLimitMiddleware = rateLimit;
+      rateLimitMiddleware = RATE_LIMIT;
 
-    const requestCounts: RequestCountRateLimitInterface[] =
-      global.requestCounts;
+    const requestCounts: RequestCountRateLimitI[] = global.requestCounts;
 
     const existingRequest = requestCounts.find(
       (request) =>
@@ -62,10 +62,10 @@ export const rateLimitAndTimeoutMiddleware = async (
     req.setTimeout(60000, () => {
       return next(faliedMiddleware(ERR_504, CodeHttpEnum.timeout));
     });
-
+    
     return next();
   } catch (err) {
-    loggingService.error((err as any).message);
+    logger.error((err as any).message);
     return next(faliedMiddleware(ERR_429, CodeHttpEnum.rateLimit));
   }
 };
