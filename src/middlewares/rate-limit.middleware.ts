@@ -62,7 +62,7 @@ export const rateLimitAndTimeoutMiddleware = async (
     req.setTimeout(60000, () => {
       return next(faliedMiddleware(ERR_504, CodeHttpEnum.timeout));
     });
-
+    
     return next();
   } catch (err) {
     logger.error((err as any).message);

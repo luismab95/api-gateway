@@ -29,23 +29,23 @@ export const originMiddleware = async (
       (middleware) => middleware.name === "origin.middleware"
     )?.props.origins;
 
-    if (!findRoute) return next(errorResponse);
+    if (!findRoute)
+      return next(faliedMiddleware(ERR_403, CodeHttpEnum.forbidden));
 
     if (origins && origins.length > 0) {
       const findOrigin = origins.find((origin: string) =>
         origin.includes(requestIp)
       );
 
-      if (!findOrigin) return next(errorResponse);
+      if (!findOrigin)
+        return next(faliedMiddleware(ERR_403, CodeHttpEnum.forbidden));
     }
 
     next();
   } catch (err) {
     logger.error((err as any).message);
-    return next(errorResponse);
+    return next(faliedMiddleware(ERR_403, CodeHttpEnum.forbidden));
   }
 };
-
-const errorResponse = faliedMiddleware(ERR_403, CodeHttpEnum.forbidden);
 
 export default originMiddleware;
