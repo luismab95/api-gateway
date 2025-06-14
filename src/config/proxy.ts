@@ -32,8 +32,8 @@ export async function startProxy(): Promise<ProxyI[]> {
       },
       logLevel: "debug",
       on: {
-        error: (err: any, _req: Request, res: Response) => {
-          logger.error(`PROXY ERROR: ${err.message}`);
+        error: (err: any, req: Request, res: Response) => {
+          logger.error(`PROXY ERROR: ${err.message} en ${req.originalUrl}`);
           res.status(CodeHttpEnum.internalServerError).json({
             status: false,
             message: ERR_502,
@@ -42,14 +42,8 @@ export async function startProxy(): Promise<ProxyI[]> {
       },
     };
 
-    const middlewares = item.middlewares.map((middleware) => {
-      const customMiddleware = require(`./../middlewares/${middleware.name}`);
-      return customMiddleware.default;
-    });
-
     apis.push({
       route: item.route,
-      middlewares: middlewares,
       proxy: createProxyMiddleware(proxyOptions),
     });
   });

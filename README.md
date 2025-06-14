@@ -29,7 +29,7 @@ This project is an **interactive API Gateway** built with **Node.js**, **Express
 Start the development server:
 
 ```sh
-npm run dev
+npm run pm2:dev
 # or
 yarn dev
 ```
@@ -60,9 +60,9 @@ yarn test
 
 ### 📜 Available Scripts
 
-- `dev` — Run the application in development mode with live reload.
+- `pm2:dev` — Run the application in development mode with live reload.
 - `build` — Compile the TypeScript code to JavaScript.
-- `start` — Start the compiled production build.
+- `pm2:start` — Start the compiled production build.
 - `test` — Run the unit tests.
 
 ## 📄 License
