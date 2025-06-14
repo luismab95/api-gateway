@@ -64,6 +64,7 @@ yarn test
 - `build` — Compile the TypeScript code to JavaScript.
 - `pm2:start` — Start the compiled production build.
 - `test` — Run the unit tests.
+- `pm2:logs` — Run the logs.
 
 ## 📄 License
 
