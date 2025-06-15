@@ -18,7 +18,7 @@ const runServer = async () => {
   const app = express();
   const corsOptions = {
     origin: CORS_ORIGIN,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     credentials: false,
   };
 
